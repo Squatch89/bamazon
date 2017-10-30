@@ -1,0 +1,23 @@
+{
+  "name": "bamazon",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Squatch89/bamazon.git"
+  },
+  "author": "Gene Williams",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Squatch89/bamazon/issues"
+  },
+  "homepage": "https://github.com/Squatch89/bamazon#readme",
+  "dependencies": {
+    "inquirer": "^3.3.0",
+    "mysql": "^2.15.0"
+  }
+}
