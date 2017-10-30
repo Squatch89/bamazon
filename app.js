@@ -52,16 +52,20 @@ function makePurchase() {
             
             for (let i = 0; i < res.length; i++) {
                 if (answer.product === res[i].product_name) {
-                    //check to see if there is enough stock to fulfill order
                     
+                    //check to see if there is enough stock to fulfill order
                     //if there is not enough display (Insufficient quantity!)
                     if (res[i].stock_quanity < answer.amount) {
                         console.log("Insufficient quantity!")
                     }
                     //if there is place the order and update the database
-                    else if (answer.amount >= res[i].stock_quanity) {
-                        console.log("can place order here");
+                    else if (res[i].stock_quanity > answer.amount) {
                         //then display the total cost
+                        placeOrder((res[i].stock_quanity - answer.amount), answer.product);
+                        displayTotal(answer.amount, res[i].price);
+                    }
+                    else {
+                        console.log("something went wrong");
                     }
                 }
             }
@@ -70,13 +74,28 @@ function makePurchase() {
     });
 }
 
-function placeOrder(){
-
+function placeOrder(quanity, product) {
+    connection.query("UPDATE products SET ? WHERE ?",
+        [
+            {
+                stock_quanity: quanity
+            },
+            {
+                product_name: product
+            }
+        ],
+        function (err, res) {
+            if (err) throw err;
+            console.log("Your order has been placed");
+        });
+    
 }
 
 function displayTotal(quanity, price) {
-    return total = quanity * price;
-};
+    total = quanity * price;
+    console.log(`Your Total is: $${total}`);
+    return connection.end();
+}
 
 
 
