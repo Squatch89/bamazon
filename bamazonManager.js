@@ -40,7 +40,12 @@ connection.connect(function (err) {
                     name: "quantity"
                 }
             ]).then(function (answer) {
-                addInventory(answer.quantity, answer.id);
+                connection.query("SELECT * FROM products", function(err, res) {
+                    if (err) throw err;
+                    oldInv = res[(answer.id - 1)].stock_quanity;
+                    addInventory((parseInt(oldInv) + parseInt(answer.quantity)), answer.id);
+                });
+                
             });
             
         }
@@ -101,13 +106,9 @@ function viewLowInventory() {
 }
 
 function addInventory(newInv, id) {
-    connection.query("SELECT * FROM products", function (err, res) {
-        oldInv = res[10].stock_quanity;
-        console.log(oldInventory);
-    });
     connection.query(`UPDATE products SET ? WHERE ?`, [
         {
-            stock_quanity: newInv + oldInv
+            stock_quanity: newInv
         },
         {
             item_id: id
