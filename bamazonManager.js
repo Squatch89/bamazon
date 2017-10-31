@@ -1,5 +1,6 @@
 const mysql = require('mysql');
 const inquirer = require('inquirer');
+let oldInv;
 
 const connection = mysql.createConnection({
     host: "localhost",
@@ -13,23 +14,65 @@ connection.connect(function (err) {
     if (err) throw err;
     inquirer.prompt([
         {
-            type: list,
+            type: "list",
             choices: ["View Products", "View Low Inventory", "Add Inventory", "Add New Product"],
             message: "Please select an option",
             name: "choice"
         }
     ]).then(function (answer) {
-        if (answer.choices === "View Products") {
+        if (answer.choice === "View Products") {
+            console.log("inside view products answer");
             viewProducts();
         }
-        else if (answer.choices === "View Low Inventory") {
+        else if (answer.choice === "View Low Inventory") {
             viewLowInventory();
         }
-        else if (answer.choices === "Add Inventory") {
-            addInventory();
+        else if (answer.choice === "Add Inventory") {
+            inquirer.prompt([
+                {
+                    type: "input",
+                    message: "Please select the item ID",
+                    name: "id"
+                },
+                {
+                    type: "input",
+                    message: "How much new product would you like to add?",
+                    name: "quantity"
+                }
+            ]).then(function (answer) {
+                addInventory(answer.quantity, answer.id);
+            });
+            
         }
-        else if (answer.choices === "Add New Product") {
-            addNewProduct();
+        else if (answer.choice === "Add New Product") {
+            inquirer.prompt([
+                {
+                    type: "input",
+                    message: "What is the name of the new product?",
+                    name: "name"
+                },
+                {
+                    type: "input",
+                    message: "What is the department of the new product?",
+                    name: "department"
+                },
+                {
+                    type: "input",
+                    message: "How much will it cost per unit?",
+                    name: "price"
+                },
+                {
+                    type: "input",
+                    message: "How much stock will we have?",
+                    name: "stock"
+                },
+            ]).then(function (answer) {
+                addNewProduct(answer.name, answer.department, answer.price, answer.stock);
+            })
+        }
+        else {
+            console.log("something went wrong");
+            connection.end();
         }
     })
     
@@ -37,22 +80,53 @@ connection.connect(function (err) {
 });
 
 function viewProducts() {
+    console.log("inside view products function");
     connection.query("SELECT * FROM products", function (err, res) {
         if (err) throw err;
         for (let i = 0; i < res.length; i++) {
-            console.log(`ID: ${res[i].item_id} | Product: ${res[i].product_name} | Price: $${res[i].price}`);
+            console.log(`ID: ${res[i].item_id} | Product: ${res[i].product_name} | Price: $${res[i].price} | Quantity: ${res[i].stock_quanity}`);
         }
+        connection.end();
     });
 }
 
 function viewLowInventory() {
-    connection.query("SELECT * FROM products HAVING count(*) < 5 ")
+    connection.query("SELECT * FROM products WHERE stock_quanity < 5", function (err, res) {
+        if (err) throw err;
+        for (let i = 0; i < res.length; i++) {
+            console.log(`ID: ${res[i].item_id} | Product: ${res[i].product_name} | Quantity: ${res[i].stock_quanity}`);
+        }
+        connection.end();
+    });
 }
 
-function addInventory() {
-
+function addInventory(newInv, id) {
+    connection.query("SELECT * FROM products", function (err, res) {
+        oldInv = res[10].stock_quanity;
+        console.log(oldInventory);
+    });
+    connection.query(`UPDATE products SET ? WHERE ?`, [
+        {
+            stock_quanity: newInv + oldInv
+        },
+        {
+            item_id: id
+        }], function (err, res) {
+        if (err) throw err;
+        console.log("Inventory has been added");
+    });
+    connection.end();
 }
 
-function addNewProduct() {
-
+function addNewProduct(name, department, price, stock) {
+    connection.query("INSERT INTO products SET ?", {
+        product_name: name,
+        department_name: department,
+        price: price,
+        stock_quanity: stock
+    }, function (err, res) {
+        if (err) throw err;
+        console.log("Item added!");
+    });
+    connection.end();
 }
