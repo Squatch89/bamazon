@@ -21,7 +21,6 @@ connection.connect(function (err) {
         }
     ]).then(function (answer) {
         if (answer.choice === "View Products") {
-            console.log("inside view products answer");
             viewProducts();
         }
         else if (answer.choice === "View Low Inventory") {
@@ -85,7 +84,6 @@ connection.connect(function (err) {
 });
 
 function viewProducts() {
-    console.log("inside view products function");
     connection.query("SELECT * FROM products", function (err, res) {
         if (err) throw err;
         for (let i = 0; i < res.length; i++) {

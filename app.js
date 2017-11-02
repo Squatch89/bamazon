@@ -22,6 +22,7 @@ connection.connect(function (err) {
 function showAll() {
     connection.query("SELECT * FROM products", function (err, res) {
         if (err) throw err;
+        console.log("\n");
         for (let i = 0; i < res.length; i++) {
             console.log(`ID: ${res[i].item_id} | Product: ${res[i].product_name} | Price: $${res[i].price}`);
         }
